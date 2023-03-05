@@ -1,6 +1,7 @@
 package com.arda.flightplanner.rest;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 import org.springframework.context.NoSuchMessageException;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -16,6 +17,7 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @RestControllerAdvice
+@Slf4j
 public class ControllerExceptionHandler {
     private final MessageSource messageSource;
 
@@ -23,6 +25,7 @@ public class ControllerExceptionHandler {
 
     @ExceptionHandler(RestServiceException.class)
     public ResponseEntity<Response<ResponseError>> handleRestServiceException(RestServiceException restServiceException) {
+        log.error("handler: " + restServiceException);
         return ResponseEntity
                 .status(findHttpStatus(restServiceException.getSeries(), restServiceException.getCode()))
                 .body(Response.error(new ResponseError(getMessage(restServiceException.getMessage()))));
@@ -32,7 +35,7 @@ public class ControllerExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     protected ResponseEntity<Response<ResponseError>> handleMethodArgumentNotValid
             (MethodArgumentNotValidException methodArgumentNotValidException) {
-
+        log.error("handler: " + methodArgumentNotValidException);
         var errorMessage = methodArgumentNotValidException
                 .getBindingResult()
                 .getAllErrors()
@@ -44,6 +47,14 @@ public class ControllerExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(Response.error(new ResponseError(errorMessage)));
+    }
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<Response<ResponseError>> handleGeneralException(RuntimeException exception) {
+        log.error("handler: " + exception);
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Response.error(new ResponseError(getMessage("exceptionHandler.exception.message"))));
     }
 
     private HttpStatus findHttpStatus(int series, int code) {

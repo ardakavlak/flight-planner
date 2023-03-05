@@ -5,7 +5,7 @@ import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.NotNull;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -21,10 +21,10 @@ public class FlightPlanDTO {
     private String destinationAirport;
 
     @NotNull(message = "flightPlanDTO.departureTime.invalidOrEmpty")
-    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
-    private Date departureTime;
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    private LocalDateTime departureTime;
 
-    private Date arrivalTime;
+    private LocalDateTime arrivalTime;
 
     @NotNull(message = "flightPlanDTO.flightDuration.invalidOrEmpty")
     private int flightDuration;

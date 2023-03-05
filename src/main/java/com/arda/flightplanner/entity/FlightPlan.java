@@ -11,6 +11,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -28,9 +29,9 @@ public class FlightPlan {
 
     private String destinationAirport;
 
-    private Date departureTime;
+    private LocalDateTime departureTime;
 
-    private Date arrivalTime;
+    private LocalDateTime arrivalTime;
 
     private int flightDuration;
 

@@ -23,6 +23,8 @@ public class FlightPlan {
     @SequenceGenerator(name = "plan_gen", sequenceName = "plan_seq")
     private Long id;
 
+    private String planeId;
+
     private String airlineCode;
 
     private String departureAirportCode;

@@ -2,6 +2,8 @@ package com.arda.flightplanner.service;
 
 import com.arda.flightplanner.entity.FlightPlan;
 import com.arda.flightplanner.repository.FlightPlanRepository;
+import com.arda.flightplanner.rest.MaxNumberReachedException;
+import com.arda.flightplanner.rest.PlaneIsAlreadyOnAFlightException;
 import com.arda.flightplanner.rest.RestServiceException;
 import com.arda.flightplanner.service.locker.DistributedLocker;
 import com.arda.flightplanner.service.locker.LockExecutionResult;
@@ -27,17 +29,21 @@ public class FlightPlanServiceImpl implements FlightPlanService {
                 5,
                 6,
                 () -> {
+                    if (repository.countByPlaneIdAndDepartureTimeBeforeAndArrivalTimeAfter(plan.getPlaneId(), plan.getArrivalTime(), plan.getDepartureTime()) > 0) {
+                        throw new PlaneIsAlreadyOnAFlightException("plane.already.in.use");
+                    }
                     if (repository.countFlight(
                             plan.getAirlineCode(),
                             plan.getDepartureAirportCode(),
                             plan.getDestinationAirport(),
                             plan.getDepartureTime().getDayOfYear(),
                             plan.getArrivalTime().getDayOfYear(),
-                            plan.getDepartureTime()
+                            plan.getDepartureTime(),
+                            plan.getArrivalTime()
                             ) < MAX_NUMBER_OF_FLIGHT) {
                         return repository.save(plan);
                     } else {
-                        return new FlightPlan();
+                        throw new MaxNumberReachedException("flightPlanServiceImpl.create.max.number");
                     }
                 });
         return result.getResultIfLockAcquired();

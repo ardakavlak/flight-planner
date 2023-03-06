@@ -11,6 +11,9 @@ import java.time.LocalDateTime;
 @Setter
 public class FlightPlanDTO {
 
+    @NotNull(message = "flightPlanDTO.planeId.invalidOrEmpty")
+    private String planeId;
+
     @NotNull(message = "flightPlanDTO.airlineCode.invalidOrEmpty")
     private String airlineCode;
 

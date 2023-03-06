@@ -4,7 +4,6 @@ import com.arda.flightplanner.dto.FlightPlanDTO;
 import com.arda.flightplanner.dto.FlightPlanResponseDTO;
 import com.arda.flightplanner.entity.FlightPlan;
 import com.arda.flightplanner.mapper.FlightPlanMapper;
-import com.arda.flightplanner.rest.MaxNumberReachedException;
 import com.arda.flightplanner.rest.Response;
 import com.arda.flightplanner.service.FlightPlanService;
 import com.arda.flightplanner.util.DateUtil;
@@ -33,9 +32,6 @@ public class FlightPlanController {
         flightPlanDTO.setArrivalTime(DateUtil.getDatePlusDuration(flightPlanDTO.getDepartureTime(), flightPlanDTO.getFlightDuration()));
         FlightPlan flightPlan = FlightPlanMapper.INSTANCE.toEntity(flightPlanDTO);
         FlightPlan savedPlan = flightPlanService.create(flightPlan);
-        if (savedPlan.getId() == null) {
-            throw new MaxNumberReachedException("flightPlanServiceImpl.create.max.number");
-        }
         FlightPlanResponseDTO flightPlanResponseDTO = FlightPlanMapper.INSTANCE.toResponseDTO(savedPlan);
         return ResponseEntity.status(HttpStatus.CREATED).body(Response.success(flightPlanResponseDTO));
     }

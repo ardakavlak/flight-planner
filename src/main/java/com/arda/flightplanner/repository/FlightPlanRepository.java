@@ -19,13 +19,17 @@ public interface FlightPlanRepository extends JpaRepository<FlightPlan, Long> {
             "OR FUNCTION('DATE_PART', 'doy', f.departureTime) = :arrivalTimeDay " +
             "OR FUNCTION('DATE_PART', 'doy', f.arrivalTime) = :departureTimeDay " +
             "OR FUNCTION('DATE_PART', 'doy', f.arrivalTime) = :arrivalTimeDay)" +
-            "AND f.arrivalTime > :departureTime")
+            "AND f.arrivalTime > :departureTime " +
+            "AND f.departureTime < :arrivalTime")
     long countFlight(
             @Param("airlineCode") String airlineCode,
             @Param("departureAirportCode") String departureAirportCode,
             @Param("destinationAirport") String destinationAirport,
             @Param("departureTimeDay") int departureTimeDay,
             @Param("arrivalTimeDay") int arrivalTimeDay,
-            @Param("departureTime") LocalDateTime departureTime);
+            @Param("departureTime") LocalDateTime departureTime,
+            @Param("arrivalTime") LocalDateTime arrivalTime);
+
+    long countByPlaneIdAndDepartureTimeBeforeAndArrivalTimeAfter(String planeId, LocalDateTime arrivalTime, LocalDateTime departureTime);
 
 }

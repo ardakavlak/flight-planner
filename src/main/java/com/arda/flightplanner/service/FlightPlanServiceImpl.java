@@ -25,7 +25,8 @@ public class FlightPlanServiceImpl implements FlightPlanService {
 
     @Override
     public FlightPlan create(FlightPlan plan) throws RestServiceException {
-        LockExecutionResult<FlightPlan> result = locker.lock("locked",
+
+        LockExecutionResult<FlightPlan> result = locker.lock(plan.getAirlineCode(),
                 5,
                 6,
                 () -> {
@@ -34,18 +35,14 @@ public class FlightPlanServiceImpl implements FlightPlanService {
                     }
                     if (repository.countFlight(
                             plan.getAirlineCode(),
-                            plan.getDepartureAirportCode(),
-                            plan.getDestinationAirport(),
-                            plan.getDepartureTime().getDayOfYear(),
-                            plan.getArrivalTime().getDayOfYear(),
-                            plan.getDepartureTime(),
-                            plan.getArrivalTime()
-                            ) < MAX_NUMBER_OF_FLIGHT) {
+                            plan.getDepartureTime().getDayOfYear()
+                    ) < MAX_NUMBER_OF_FLIGHT) {
                         return repository.save(plan);
                     } else {
                         throw new MaxNumberReachedException("flightPlanServiceImpl.create.max.number");
                     }
                 });
         return result.getResultIfLockAcquired();
+
     }
 }

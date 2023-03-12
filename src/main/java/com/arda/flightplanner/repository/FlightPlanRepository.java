@@ -12,13 +12,20 @@ public interface FlightPlanRepository extends JpaRepository<FlightPlan, Long> {
 
     @Query("SELECT count(*) FROM FlightPlan f " +
             "WHERE f.airlineCode = :airlineCode " +
+            "AND FUNCTION('DATE_PART', 'doy', f.departureTime) = :departureTimeDay ")
+    long countFlight(
+            @Param("airlineCode") String airlineCode,
+            @Param("departureTimeDay") int departureTimeDay);
+
+    long countByPlaneIdAndDepartureTimeBeforeAndArrivalTimeAfter(String planeId, LocalDateTime arrivalTime, LocalDateTime departureTime);
+
+
+
+    /*@Query("SELECT count(*) FROM FlightPlan f " +
+            "WHERE f.airlineCode = :airlineCode " +
             "AND f.departureAirportCode = :departureAirportCode " +
             "AND f.destinationAirport = :destinationAirport " +
-            "AND " +
-            "(FUNCTION('DATE_PART', 'doy', f.departureTime) = :departureTimeDay " +
-            "OR FUNCTION('DATE_PART', 'doy', f.departureTime) = :arrivalTimeDay " +
-            "OR FUNCTION('DATE_PART', 'doy', f.arrivalTime) = :departureTimeDay " +
-            "OR FUNCTION('DATE_PART', 'doy', f.arrivalTime) = :arrivalTimeDay)" +
+            "AND FUNCTION('DATE_PART', 'doy', f.departureTime) = :departureTimeDay " +
             "AND f.arrivalTime > :departureTime " +
             "AND f.departureTime < :arrivalTime")
     long countFlight(
@@ -26,10 +33,7 @@ public interface FlightPlanRepository extends JpaRepository<FlightPlan, Long> {
             @Param("departureAirportCode") String departureAirportCode,
             @Param("destinationAirport") String destinationAirport,
             @Param("departureTimeDay") int departureTimeDay,
-            @Param("arrivalTimeDay") int arrivalTimeDay,
             @Param("departureTime") LocalDateTime departureTime,
-            @Param("arrivalTime") LocalDateTime arrivalTime);
-
-    long countByPlaneIdAndDepartureTimeBeforeAndArrivalTimeAfter(String planeId, LocalDateTime arrivalTime, LocalDateTime departureTime);
+            @Param("arrivalTime") LocalDateTime arrivalTime);*/
 
 }

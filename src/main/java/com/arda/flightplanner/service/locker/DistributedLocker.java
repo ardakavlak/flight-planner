@@ -1,6 +1,8 @@
 package com.arda.flightplanner.service.locker;
 
 import com.arda.flightplanner.rest.FailedToAcquireLockException;
+import com.arda.flightplanner.rest.MaxNumberReachedException;
+import com.arda.flightplanner.rest.PlaneIsAlreadyOnAFlightException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
@@ -32,6 +34,12 @@ public class DistributedLocker {
                 try {
                     T taskResult = task.call();
                     return LockExecutionResult.buildLockAcquiredResult(taskResult);
+                } catch (MaxNumberReachedException e) {
+                    log.error(e.getMessage(), e);
+                    throw new MaxNumberReachedException(e.getMessage());
+                } catch (PlaneIsAlreadyOnAFlightException e) {
+                    log.error(e.getMessage(), e);
+                    throw new PlaneIsAlreadyOnAFlightException(e.getMessage());
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
                     return LockExecutionResult.buildLockAcquiredWithException(e);
@@ -39,6 +47,11 @@ public class DistributedLocker {
                     releaseLock(key);
                 }
             }, key, howLongShouldLockBeAcquiredSeconds);
+        } catch (MaxNumberReachedException e) {
+            throw new MaxNumberReachedException(e.getMessage());
+        } catch (PlaneIsAlreadyOnAFlightException e) {
+            log.error(e.getMessage(), e);
+            throw new PlaneIsAlreadyOnAFlightException(e.getMessage());
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             return LockExecutionResult.buildLockAcquiredWithException(e);

@@ -25,7 +25,6 @@ public class ControllerExceptionHandler {
 
     @ExceptionHandler(RestServiceException.class)
     public ResponseEntity<Response<ResponseError>> handleRestServiceException(RestServiceException restServiceException) {
-        log.error("handler: " + restServiceException);
         return ResponseEntity
                 .status(findHttpStatus(restServiceException.getSeries(), restServiceException.getCode()))
                 .body(Response.error(new ResponseError(getMessage(restServiceException.getMessage()))));

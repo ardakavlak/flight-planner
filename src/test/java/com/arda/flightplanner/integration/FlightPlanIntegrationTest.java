@@ -6,7 +6,6 @@ import com.arda.flightplanner.dto.FlightPlanResponseDTO;
 import com.arda.flightplanner.entity.FlightPlan;
 import com.arda.flightplanner.repository.FlightPlanRepository;
 import com.arda.flightplanner.rest.Response;
-import com.arda.flightplanner.service.FlightPlanService;
 import com.arda.flightplanner.util.DateUtil;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -45,9 +44,6 @@ class FlightPlanIntegrationTest {
     private FlightPlanRepository repository;
 
     @Autowired
-    private FlightPlanService flightPlanService;
-
-    @Autowired
     private FlightPlanController controller;
 
     @AfterEach
@@ -56,11 +52,12 @@ class FlightPlanIntegrationTest {
     }
 
     @Test
-    void givenFlightPlanDTO_whenCreate_ThenReturn210() throws ParseException {
+    void givenFlightPlanDTO_whenCreate_ThenReturn210() {
 
         //given
         var flightPlanDTO = new FlightPlanDTO();
         flightPlanDTO.setAirlineCode("airline1");
+        flightPlanDTO.setPlaneId("flight123");
         flightPlanDTO.setDepartureAirportCode("airport1");
         flightPlanDTO.setDestinationAirport("airport2");
         flightPlanDTO.setDepartureTime(LocalDateTime.now());
@@ -84,6 +81,7 @@ class FlightPlanIntegrationTest {
         //given
         var flightPlanDTO = new FlightPlanDTO();
         flightPlanDTO.setAirlineCode("airline1");
+        flightPlanDTO.setPlaneId("flight123");
         flightPlanDTO.setDepartureAirportCode("airport1");
         flightPlanDTO.setDestinationAirport("airport2");
         flightPlanDTO.setDepartureTime(LocalDateTime.now());
@@ -91,6 +89,7 @@ class FlightPlanIntegrationTest {
 
         var flightPlan1 = new FlightPlan();
         flightPlan1.setAirlineCode("airline1");
+        flightPlan1.setPlaneId("flight123");
         flightPlan1.setDepartureAirportCode("airport1");
         flightPlan1.setDestinationAirport("airport2");
         flightPlan1.setDepartureTime(LocalDateTime.now());
@@ -99,6 +98,7 @@ class FlightPlanIntegrationTest {
 
         var flightPlan2 = new FlightPlan();
         flightPlan2.setAirlineCode("airline1");
+        flightPlan2.setPlaneId("flight123");
         flightPlan2.setDepartureAirportCode("airport1");
         flightPlan2.setDestinationAirport("airport2");
         flightPlan2.setDepartureTime(LocalDateTime.now());
@@ -107,6 +107,7 @@ class FlightPlanIntegrationTest {
 
         var flightPlan3 = new FlightPlan();
         flightPlan3.setAirlineCode("airline1");
+        flightPlan3.setPlaneId("flight123");
         flightPlan3.setDepartureAirportCode("airport1");
         flightPlan3.setDestinationAirport("airport2");
         flightPlan3.setDepartureTime(LocalDateTime.now());
@@ -133,6 +134,7 @@ class FlightPlanIntegrationTest {
 
         var flightPlanDTO1 = new FlightPlanDTO();
         flightPlanDTO1.setAirlineCode("airline1");
+        flightPlanDTO1.setPlaneId("flight123");
         flightPlanDTO1.setDepartureAirportCode("airport1");
         flightPlanDTO1.setDestinationAirport("airport2");
         flightPlanDTO1.setDepartureTime(LocalDateTime.now());
@@ -140,6 +142,7 @@ class FlightPlanIntegrationTest {
 
         var flightPlanDTO2 = new FlightPlanDTO();
         flightPlanDTO2.setAirlineCode("airline1");
+        flightPlanDTO2.setPlaneId("flight124");
         flightPlanDTO2.setDepartureAirportCode("airport1");
         flightPlanDTO2.setDestinationAirport("airport2");
         flightPlanDTO2.setDepartureTime(LocalDateTime.now());
@@ -147,6 +150,7 @@ class FlightPlanIntegrationTest {
 
         var flightPlanDTO3 = new FlightPlanDTO();
         flightPlanDTO3.setAirlineCode("airline1");
+        flightPlanDTO3.setPlaneId("flight125");
         flightPlanDTO3.setDepartureAirportCode("airport1");
         flightPlanDTO3.setDestinationAirport("airport2");
         flightPlanDTO3.setDepartureTime(LocalDateTime.now());
@@ -154,6 +158,7 @@ class FlightPlanIntegrationTest {
 
         var flightPlanDTO4 = new FlightPlanDTO();
         flightPlanDTO4.setAirlineCode("airline1");
+        flightPlanDTO4.setPlaneId("flight126");
         flightPlanDTO4.setDepartureAirportCode("airport1");
         flightPlanDTO4.setDestinationAirport("airport2");
         flightPlanDTO4.setDepartureTime(LocalDateTime.now());
@@ -164,5 +169,48 @@ class FlightPlanIntegrationTest {
                         .map(fp -> (Callable<ResponseEntity<Response<FlightPlanResponseDTO>>>) () -> controller.create(fp)).toList());
 
         Assertions.assertEquals(3, repository.count());
+    }
+
+
+    @Test
+    void shouldInsert1WhenTryToCreateMultipleFlightsWithSamePlaneIdConcurrently() throws InterruptedException {
+
+        var flightPlanDTO1 = new FlightPlanDTO();
+        flightPlanDTO1.setAirlineCode("airline1");
+        flightPlanDTO1.setPlaneId("pl1");
+        flightPlanDTO1.setDepartureAirportCode("airport1");
+        flightPlanDTO1.setDestinationAirport("airport2");
+        flightPlanDTO1.setDepartureTime(LocalDateTime.now());
+        flightPlanDTO1.setFlightDuration(120);
+
+        var flightPlanDTO2 = new FlightPlanDTO();
+        flightPlanDTO2.setAirlineCode("airline1");
+        flightPlanDTO2.setPlaneId("pl1");
+        flightPlanDTO2.setDepartureAirportCode("airport1");
+        flightPlanDTO2.setDestinationAirport("airport2");
+        flightPlanDTO2.setDepartureTime(LocalDateTime.now());
+        flightPlanDTO2.setFlightDuration(120);
+
+        var flightPlanDTO3 = new FlightPlanDTO();
+        flightPlanDTO3.setAirlineCode("airline1");
+        flightPlanDTO3.setPlaneId("pl1");
+        flightPlanDTO3.setDepartureAirportCode("airport1");
+        flightPlanDTO3.setDestinationAirport("airport2");
+        flightPlanDTO3.setDepartureTime(LocalDateTime.now());
+        flightPlanDTO3.setFlightDuration(120);
+
+        var flightPlanDTO4 = new FlightPlanDTO();
+        flightPlanDTO4.setAirlineCode("airline1");
+        flightPlanDTO4.setPlaneId("pl1");
+        flightPlanDTO4.setDepartureAirportCode("airport1");
+        flightPlanDTO4.setDestinationAirport("airport2");
+        flightPlanDTO4.setDepartureTime(LocalDateTime.now());
+        flightPlanDTO4.setFlightDuration(120);
+
+        Executors.newFixedThreadPool(4)
+                .invokeAll(Stream.of(flightPlanDTO1, flightPlanDTO2, flightPlanDTO3, flightPlanDTO4)
+                        .map(fp -> (Callable<ResponseEntity<Response<FlightPlanResponseDTO>>>) () -> controller.create(fp)).toList());
+
+        Assertions.assertEquals(1, repository.count());
     }
 }
